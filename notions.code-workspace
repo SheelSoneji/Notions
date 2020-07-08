@@ -4,5 +4,7 @@
       "path": "."
     }
   ],
-  "settings": {}
+"settings": {
+    "python.pythonPath": "/Users/sheelsoneji/.local/share/virtualenvs/notions-yfD8Q-I2/bin/python"
+}
 }
