@@ -1,0 +1,24 @@
+-> Users
+-> Register
+-> Login
+-> Logout
+-> Profile
+-> Image?
+-> Text?
+-> Follow Button?
+-> Feed
+-> User's feed only?
+-> User + who they follow?
+-> Notions
+-> Creating
+-> Text
+-> Image
+-> Delete
+-> Share
+-> Following/Followers
+
+-> Long term todos
+-> DM
+-> Notifications
+-> Hashtags
+-> Recommend opinions endorsement based on agreed opinions
