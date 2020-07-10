@@ -19,8 +19,13 @@
     <title>{% block headtitle %} {% endblock headtitle %}</title>
   </head>
   <body>
-    {% block content %}
-    {% endblock content %}
+    {% include 'components/navbar.html' %}
+    <!-- components/navbar goes here -->
+    <div class="container-fluid">
+      {% block content %}
+      <!-- home.html goes here -->
+      {% endblock content %}
+    </div>
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->

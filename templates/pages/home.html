@@ -12,6 +12,34 @@
   const url = "/notions";
   const responseType = "json";
 
+  function handleDidLike(notion_id, notion_like_count) {
+    console.log(notion_id, notion_like_count);
+    return;
+  }
+  function LikeBtn(notion) {
+    return (
+      "<button class='btn btn-primary btn-sm' onclick= handleDidLike(" +
+      notion.id +
+      "," +
+      notion.likes +
+      ")>" +
+      notion.likes +
+      " Like</button>"
+    );
+  }
+
+  function formatNotionElement(notion) {
+    var fortmattedNotion =
+      "<div class= 'mb-4' id= 'notion-" +
+      notion.id +
+      "'<p>" +
+      notion.content +
+      "</p><div class= 'btn-group'>" +
+      LikeBtn(notion) +
+      "</div></div>";
+    return fortmattedNotion;
+  }
+
   xhr.responseType = responseType;
   xhr.open(method, url);
 
@@ -21,15 +49,8 @@
     var finalNotionsStr = "";
     var i = 0;
     for (i = 0; i < listedItems.length; i++) {
-      console.log(i);
-      console.log(listedItems[i]);
-      var currentItem =
-        "<h1>" +
-        listedItems[i].id +
-        "</h1>" +
-        "<p>" +
-        listedItems[i].content +
-        "</p>";
+      var notionObj = listedItems[i];
+      var currentItem = formatNotionElement(notionObj);
       finalNotionsStr = finalNotionsStr + currentItem;
     }
     notionsElement.innerHTML = finalNotionsStr;

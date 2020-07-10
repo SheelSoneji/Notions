@@ -1,3 +1,4 @@
+import random
 from django.http import HttpResponse, Http404, JsonResponse
 from django.shortcuts import render
 from .models import Notion
@@ -10,7 +11,8 @@ def home_view(request, *args, **kwargs):
 
 def notion_list_view(request, *args, **kwargs):
     qs = Notion.objects.all()
-    notion_list = [{"id": x.id, "content": x.content}for x in qs]
+    notion_list = [{"id": x.id, "content": x.content,
+                    "likes": random.randint(0, 100)}for x in qs]
     data = {
         "isUser": False,
         "response": notion_list,
