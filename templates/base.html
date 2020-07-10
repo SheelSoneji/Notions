@@ -15,13 +15,18 @@
       integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk"
       crossorigin="anonymous"
     />
+    <style>
+      .bg-notions {
+        background-color: #2f2f3c !important;
+      }
+    </style>
 
     <title>{% block headtitle %} {% endblock headtitle %}</title>
   </head>
   <body>
     {% include 'components/navbar.html' %}
     <!-- components/navbar goes here -->
-    <div class="container-fluid">
+    <div class="container">
       {% block content %}
       <!-- home.html goes here -->
       {% endblock content %}

@@ -1,8 +1,12 @@
 {% extends 'base.html' %} {% block headtitle %} testing {% endblock headtitle %}
 {% block content %}
-<h1>Welcome to Notions</h1>
+<div class="row text-center">
+  <div class="col">
+    <h1>Welcome to Notions</h1>
+  </div>
+</div>
 
-<div id="notions">loading...</div>
+<div class="row" id="notions">loading...</div>
 <script>
   // this basically, queries /notions and expects a json response which is then printed in the log of the home.html
   const notionsElement = document.getElementById("notions");
@@ -30,7 +34,7 @@
 
   function formatNotionElement(notion) {
     var fortmattedNotion =
-      "<div class= 'mb-4' id= 'notion-" +
+      "<div class= 'col-12 col-md-10 mx-auto border rounded py-3 mb-4' id= 'notion-" +
       notion.id +
       "'<p>" +
       notion.content +
