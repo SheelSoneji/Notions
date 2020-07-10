@@ -8,10 +8,20 @@
 
 <div class="row mb-3">
   <div class="col-md-4 mx-auto col-10">
-    <form class="form" method="POST" action="/create-notion">
+    <form
+      class="form"
+      id="notions-create-form"
+      method="POST"
+      action="/create-notion"
+    >
       {% csrf_token %}
+      <div
+        class="d-none alert alert-danger"
+        id="notions-create-form-error"
+      ></div>
       <input type="hidden" value="/" name="next" />
       <textarea
+        required="required"
         class="form-control"
         name="content"
         placeholder="Post a notion"
@@ -23,13 +33,92 @@
 
 <div class="row" id="notions">loading...</div>
 <script>
+  function handleNotionFormError(msg, display) {
+    var myErrorDiv = document.getElementById("notions-create-form-error");
+    if (display === true) {
+      //show error
+      myErrorDiv.setAttribute("class", "d-block alert alert-danger");
+      myErrorDiv.innerHTML = msg;
+    } else {
+      //hide error
+      myErrorDiv.setAttribute("class", "d-none alert alert-danger");
+    }
+  }
+  function handleNotionCreateFormDidSubmit(event) {
+    event.preventDefault();
+    const myForm = event.target;
+    const myFormData = new FormData(myForm);
+    const url = myForm.getAttribute("action");
+    const method = myForm.getAttribute("method");
+    const xhr = new XMLHttpRequest();
+    const responseType = "json";
+    xhr.responseType = responseType;
+    xhr.open(method, url);
+    xhr.setRequestHeader("HTTP_X_REQUESTED_WITH", "XMLHttpRequest");
+    xhr.setRequestHeader("X-Requested-with", "XMLHttpRequest");
+    xhr.onload = function() {
+      if (xhr.status === 201) {
+        handleNotionFormError("", false);
+        const newNotionJson = xhr.response;
+        //const newNotionJson = JSON.parse(newNotion);
+        const newNotionElement = formatNotionElement(newNotionJson);
+        const ogHtml = notionsContainerElemet.innerHTML;
+        notionsContainerElemet.innerHTML = newNotionElement + ogHtml;
+        myForm.reset();
+      } else if (xhr.status === 400) {
+        const errorJson = xhr.response;
+        const contentError = errorJson.content;
+        let contentErrorMsg;
+        if (contentError) {
+          contentErrorMsg = contentError[0];
+          if (contentErrorMsg) {
+            handleNotionFormError(contentErrorMsg, true);
+          } else {
+            alert("An error occured. Please try again later");
+          }
+        } else {
+          alert("An error occured. Please try again later");
+        }
+      } else if (xhr.status === 500) {
+        alert("There was a server error. Please try again later.");
+      }
+      xhr.onerror = function() {
+        alert("An error occured. Please try again later.");
+      };
+    };
+    xhr.send(myFormData);
+  }
+  const notionCreateFormEl = document.getElementById("notions-create-form");
+  notionCreateFormEl.addEventListener(
+    "submit",
+    handleNotionCreateFormDidSubmit
+  );
   // this basically, queries /notions and expects a json response which is then printed in the log of the home.html
-  const notionsElement = document.getElementById("notions");
+  const notionsContainerElemet = document.getElementById("notions");
 
-  const xhr = new XMLHttpRequest();
-  const method = "GET";
-  const url = "/notions";
-  const responseType = "json";
+  const loadNotions = function(notionsElement) {
+    const xhr = new XMLHttpRequest();
+    const method = "GET";
+    const url = "/notions";
+    const responseType = "json";
+    xhr.responseType = responseType;
+    xhr.open(method, url);
+    xhr.onload = function() {
+      const serverResponse = xhr.response;
+      var listedItems = serverResponse.response;
+      var finalNotionsStr = "";
+      var i = 0;
+      for (i = 0; i < listedItems.length; i++) {
+        var notionObj = listedItems[i];
+        var currentItem = formatNotionElement(notionObj);
+        finalNotionsStr = finalNotionsStr + currentItem;
+      }
+      notionsElement.innerHTML = finalNotionsStr;
+    };
+    xhr.send();
+  };
+
+  loadNotions(notionsContainerElemet);
 
   function handleDidLike(notion_id, notion_like_count) {
     console.log(notion_id, notion_like_count);
@@ -58,22 +147,5 @@
       "</div></div>";
     return fortmattedNotion;
   }
-
-  xhr.responseType = responseType;
-  xhr.open(method, url);
-
-  xhr.onload = function() {
-    const serverResponse = xhr.response;
-    var listedItems = serverResponse.response;
-    var finalNotionsStr = "";
-    var i = 0;
-    for (i = 0; i < listedItems.length; i++) {
-      var notionObj = listedItems[i];
-      var currentItem = formatNotionElement(notionObj);
-      finalNotionsStr = finalNotionsStr + currentItem;
-    }
-    notionsElement.innerHTML = finalNotionsStr;
-  };
-  xhr.send();
 </script>
 {% endblock content %}

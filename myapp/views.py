@@ -1,8 +1,12 @@
 import random
+from django.conf import settings
 from django.http import HttpResponse, Http404, JsonResponse
 from django.shortcuts import render, redirect
+from django.utils.http import is_safe_url
 from .models import Notion
 from .forms import NotionForm
+
+ALLOWED_HOSTS = settings.ALLOWED_HOSTS
 
 # Create your views here.
 
@@ -17,16 +21,21 @@ def notion_create_view(request, *args, **kwargs):
     if form.is_valid():
         obj = form.save(commit=False)
         obj.save()
-        if next_url != None:
+        if request.is_ajax():
+            # 201 == creatd items
+            return JsonResponse(obj.serialize(), status=201)
+        if next_url != None and is_safe_url(next_url, ALLOWED_HOSTS):
             return redirect(next_url)
         form = NotionForm()
+    if form.errors:
+        if request.is_ajax():
+            return JsonResponse(form.errors, status=400)
     return render(request, 'components/form.html', context={"form": form})
 
 
 def notion_list_view(request, *args, **kwargs):
     qs = Notion.objects.all()
-    notion_list = [{"id": x.id, "content": x.content,
-                    "likes": random.randint(0, 100)}for x in qs]
+    notion_list = [x.serialize() for x in qs]
     data = {
         "isUser": False,
         "response": notion_list,
