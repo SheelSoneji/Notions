@@ -1,5 +1,7 @@
 import random
 from .serializers import NotionSerializer
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
 from django.conf import settings
 from django.http import HttpResponse, Http404, JsonResponse
 from django.shortcuts import render, redirect
@@ -16,12 +18,30 @@ def home_view(request, *args, **kwargs):
     return render(request, "pages/home.html", context={}, status=200)
 
 
+@api_view(['POST'])  # http method that the client has to send is === POST
 def notion_create_view(request, *args, **kwargs):
-    serializer = NotionSerializer(data=request.POST or None)
-    if serializer.is_valid():
-        obj = serializer.save(user=request.user)
-        return JsonResponse(serializer.data, status=201)
-    return JsonResponse({}, status=400)
+    serializer = NotionSerializer(data=request.POST)
+    if serializer.is_valid(raise_exception=True):
+        serializer.save(user=request.user)
+        return Response(serializer.data, status=201)
+    return Response({}, status=400)
+
+
+@api_view(['GET'])  # http method that the client has to send is === GET
+def notion_list_view(request, *args, **kwargs):
+    qs = Notion.objects.all()
+    serializer = NotionSerializer(qs, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])  # http method that the client has to send is === GET
+def notion_detail_view(request, notion_id, *args, **kwargs):
+    qs = Notion.objects.filter(id=notion_id)
+    if not qs.exists():
+        return Response({}, status=404)
+    obj = qs.first()
+    serializer = NotionSerializer(obj)
+    return Response(serializer.data, status=200)
 
 
 def notion_create_view_pure_django(request, *args, **kwargs):
@@ -49,7 +69,7 @@ def notion_create_view_pure_django(request, *args, **kwargs):
     return render(request, 'components/form.html', context={"form": form})
 
 
-def notion_list_view(request, *args, **kwargs):
+def notion_list_view_pure_django(request, *args, **kwargs):
     qs = Notion.objects.all()
     notion_list = [x.serialize() for x in qs]
     data = {
@@ -59,7 +79,7 @@ def notion_list_view(request, *args, **kwargs):
     return JsonResponse(data)
 
 
-def notion_detail_view(request, notion_id, *args, **kwargs):
+def notion_detail_view_pure_django(request, notion_id, *args, **kwargs):
     data = {
         "id": notion_id,
     }
