@@ -16,10 +16,17 @@ def home_view(request, *args, **kwargs):
 
 
 def notion_create_view(request, *args, **kwargs):
+    user = request.user
+    if not request.user.is_authenticated:
+        user = None
+        if request.is_ajax():
+            return JsonResponse({}, status=401)
+        return redirect(settings.LOGIN_URL)
     form = NotionForm(request.POST or None)
     next_url = request.POST.get("next") or None
     if form.is_valid():
         obj = form.save(commit=False)
+        obj.user = request.user
         obj.save()
         if request.is_ajax():
             # 201 == creatd items
