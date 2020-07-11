@@ -14,6 +14,9 @@ class Notion(models.Model):
     class Meta:
         ordering = ['-id']
 
+    def __str__(self):
+        return self.content
+
     def serialize(self):
         return {
             "id": self.id,
