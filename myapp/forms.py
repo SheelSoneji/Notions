@@ -1,7 +1,9 @@
+from django.conf import settings
 from django import forms
 from .models import Notion
 
-MAX_NOTION_LENGTH = 240
+
+MAX_NOTION_LENGTH = settings.MAX_NOTION_LENGTH
 
 
 class NotionForm(forms.ModelForm):

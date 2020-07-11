@@ -1,4 +1,5 @@
 import random
+from .serializers import NotionSerializer
 from django.conf import settings
 from django.http import HttpResponse, Http404, JsonResponse
 from django.shortcuts import render, redirect
@@ -16,6 +17,14 @@ def home_view(request, *args, **kwargs):
 
 
 def notion_create_view(request, *args, **kwargs):
+    serializer = NotionSerializer(data=request.POST or None)
+    if serializer.is_valid():
+        obj = serializer.save(user=request.user)
+        return JsonResponse(serializer.data, status=201)
+    return JsonResponse({}, status=400)
+
+
+def notion_create_view_pure_django(request, *args, **kwargs):
     user = request.user
     if not request.user.is_authenticated:
         user = None
