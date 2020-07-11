@@ -1,7 +1,11 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import Notion
+from .models import Notion, NotionLike
+
+
+class NotionLikeAdmin(admin.TabularInline):
+    model = NotionLike
 
 
 class NotionAdmin(admin.ModelAdmin):

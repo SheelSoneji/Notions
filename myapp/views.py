@@ -1,7 +1,9 @@
 import random
 from .serializers import NotionSerializer
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
+from rest_framework.authentication import SessionAuthentication
+from rest_framework.permissions import IsAuthenticated
 from django.conf import settings
 from django.http import HttpResponse, Http404, JsonResponse
 from django.shortcuts import render, redirect
@@ -19,6 +21,7 @@ def home_view(request, *args, **kwargs):
 
 
 @api_view(['POST'])  # http method that the client has to send is === POST
+@permission_classes([IsAuthenticated])
 def notion_create_view(request, *args, **kwargs):
     serializer = NotionSerializer(data=request.POST)
     if serializer.is_valid(raise_exception=True):
@@ -28,6 +31,8 @@ def notion_create_view(request, *args, **kwargs):
 
 
 @api_view(['GET'])  # http method that the client has to send is === GET
+# @authentication_classes([SessionAuthentication])
+@permission_classes([IsAuthenticated])
 def notion_list_view(request, *args, **kwargs):
     qs = Notion.objects.all()
     serializer = NotionSerializer(qs, many=True)
@@ -42,6 +47,21 @@ def notion_detail_view(request, notion_id, *args, **kwargs):
     obj = qs.first()
     serializer = NotionSerializer(obj)
     return Response(serializer.data, status=200)
+
+
+# http method that the client has to send is === GET
+@api_view(['DELETE', 'POST'])
+@permission_classes([IsAuthenticated])
+def notion_delete_view(request, notion_id, *args, **kwargs):
+    qs = Notion.objects.filter(id=notion_id)
+    if not qs.exists():
+        return Response({}, status=404)
+    qs = qs.filter(user=request.user)
+    if not qs.exists():
+        return Response({"message": "You cannot delete this notion"}, status=401)
+    obj = qs.first()
+    obj.delete()
+    return Response({"message": "Notion deleted successfully"}, status=200)
 
 
 def notion_create_view_pure_django(request, *args, **kwargs):
