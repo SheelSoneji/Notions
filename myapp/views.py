@@ -1,5 +1,5 @@
 import random
-from .serializers import NotionSerializer
+from .serializers import NotionSerializer, NotionActionSerializer
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.authentication import SessionAuthentication
@@ -12,6 +12,7 @@ from .models import Notion
 from .forms import NotionForm
 
 ALLOWED_HOSTS = settings.ALLOWED_HOSTS
+
 
 # Create your views here.
 
@@ -61,6 +62,33 @@ def notion_delete_view(request, notion_id, *args, **kwargs):
         return Response({"message": "You cannot delete this notion"}, status=401)
     obj = qs.first()
     obj.delete()
+    return Response({"message": "Notion deleted successfully"}, status=200)
+
+# http method that the client has to send is === GET
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def notion_action_view(request, notion_id, *args, **kwargs):
+    '''
+    Action options: like, unlike and share
+    '''
+    serializer = NotionActionSerializer(request.POST)
+    if serializer.is_valid(raise_exception=True):
+        data = serializer.validated_data
+        notion_id = data.get("id")
+        action = data.get("action")
+        qs = Notion.objects.filter(id=notion_id)
+        if not qs.exists():
+            return Response({}, status=404)
+        obj = qs.first()
+        if action == "like":
+            obj.likes.add(request.user)
+        elif action == "unlike":
+            obj.likes.remove(request.user)
+        elif action == "share":
+            # todo
+            pass
     return Response({"message": "Notion deleted successfully"}, status=200)
 
 
