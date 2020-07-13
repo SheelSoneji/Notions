@@ -79,6 +79,7 @@ def notion_action_view(request, *args, **kwargs):
         # print(data)
         notion_id = data.get("id")
         action = data.get("action")
+        content = data.get("content")
         qs = Notion.objects.filter(id=notion_id)
         if not qs.exists():
             return Response({}, status=404)
@@ -90,10 +91,8 @@ def notion_action_view(request, *args, **kwargs):
         elif action == "unlike":
             obj.likes.remove(request.user)
         elif action == "share":
-            # todo
-            parent_obj = obj
             new_notion = Notion.objects.create(
-                user=request.user, parent=parent_obj)
+                user=request.user, parent=obj, content=content)
             serializer = NotionSerializer(new_notion)
             return Response(serializer.data, status=200)
     return Response({}, status=200)
