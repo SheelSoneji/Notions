@@ -91,7 +91,11 @@ def notion_action_view(request, *args, **kwargs):
             obj.likes.remove(request.user)
         elif action == "share":
             # todo
-            pass
+            parent_obj = obj
+            new_notion = Notion.objects.create(
+                user=request.user, parent=parent_obj)
+            serializer = NotionSerializer(new_notion)
+            return Response(serializer.data, status=200)
     return Response({}, status=200)
 
 

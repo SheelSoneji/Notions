@@ -13,6 +13,7 @@ class NotionLike(models.Model):
 
 
 class Notion(models.Model):
+    parent = models.ForeignKey("self", null=True, on_delete=models.SET_NULL)
     user = models.ForeignKey(User, on_delete=models.CASCADE)  # many
     content = models.TextField(blank=True, null=True)
     likes = models.ManyToManyField(
