@@ -69,13 +69,14 @@ def notion_delete_view(request, notion_id, *args, **kwargs):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def notion_action_view(request, notion_id, *args, **kwargs):
+def notion_action_view(request, *args, **kwargs):
     '''
     Action options: like, unlike and share
     '''
-    serializer = NotionActionSerializer(request.POST)
+    serializer = NotionActionSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
         data = serializer.validated_data
+        # print(data)
         notion_id = data.get("id")
         action = data.get("action")
         qs = Notion.objects.filter(id=notion_id)
@@ -84,12 +85,14 @@ def notion_action_view(request, notion_id, *args, **kwargs):
         obj = qs.first()
         if action == "like":
             obj.likes.add(request.user)
+            serializer = NotionSerializer(obj)
+            return Response(serializer.data, status=200)
         elif action == "unlike":
             obj.likes.remove(request.user)
         elif action == "share":
             # todo
             pass
-    return Response({"message": "Notion deleted successfully"}, status=200)
+    return Response({}, status=200)
 
 
 def notion_create_view_pure_django(request, *args, **kwargs):
