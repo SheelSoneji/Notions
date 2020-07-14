@@ -11,9 +11,11 @@ class NotionTestCase(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(
             username="cfe", password="somepassword")
+        self.userb = User.objects.create_user(
+            username="cfe2", password="somepassword2")
         Notion.objects.create(content="MyFirstNotion", user=self.user)
         Notion.objects.create(content="MySecondNotion", user=self.user)
-        Notion.objects.create(content="MyThirdNotion", user=self.user)
+        Notion.objects.create(content="MyThirdNotion", user=self.userb)
         self.currentCount = Notion.objects.all().count()
 
     def test_notion_created(self):
@@ -84,3 +86,12 @@ class NotionTestCase(TestCase):
         data = response.json()
         _id = data.get("id")
         self.assertEqual(_id, 1)
+
+    def test_notion_delete_api_view(self):
+        client = self.get_client()
+        response = client.delete("/api/notions/1/delete/")
+        self.assertEqual(response.status_code, 200)
+        response = client.delete("/api/notions/1/delete/")
+        self.assertEqual(response.status_code, 404)
+        response_incorrect_owner = client.delete("/api/notions/3/delete/")
+        self.assertEqual(response_incorrect_owner.status_code, 401)
