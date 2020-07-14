@@ -14,11 +14,12 @@ class NotionActionSerializer(serializers.Serializer):
     def validate_action(self, value):
         value = value.lower().strip()
         if not value in NOTION_ACTION_OPTION:
-            raise serializers.ValidationError("This is not a valid action for notions")
+            raise serializers.ValidationError(
+                "This is not a valid action for notions")
         return value
 
 
-class NotionSerializer(serializers.ModelSerializer):
+class NotionCreateSerializer(serializers.ModelSerializer):
     likes = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
@@ -32,3 +33,15 @@ class NotionSerializer(serializers.ModelSerializer):
         if len(value) > MAX_NOTION_LENGTH:
             raise serializers.ValidationError("This notion is too long")
         return value
+
+
+class NotionSerializer(serializers.ModelSerializer):
+    likes = serializers.SerializerMethodField(read_only=True)
+    parent = NotionCreateSerializer(read_only=True)
+
+    class Meta:
+        model = Notion
+        fields = ['id', 'content', 'likes', 'is_share', 'parent']
+
+    def get_likes(self, obj):
+        return obj.likes.count()

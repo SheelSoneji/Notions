@@ -27,7 +27,12 @@ class Notion(models.Model):
     def __str__(self):
         return self.content
 
+    @property
+    def is_share(self):
+        return self.parent != None
+
     def serialize(self):
+
         return {
             "id": self.id,
             "content": self.content,

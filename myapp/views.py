@@ -1,5 +1,5 @@
 import random
-from .serializers import NotionSerializer, NotionActionSerializer
+from .serializers import NotionSerializer, NotionActionSerializer, NotionCreateSerializer
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.authentication import SessionAuthentication
@@ -24,7 +24,7 @@ def home_view(request, *args, **kwargs):
 @api_view(['POST'])  # http method that the client has to send is === POST
 @permission_classes([IsAuthenticated])
 def notion_create_view(request, *args, **kwargs):
-    serializer = NotionSerializer(data=request.POST)
+    serializer = NotionCreateSerializer(data=request.POST)
     if serializer.is_valid(raise_exception=True):
         serializer.save(user=request.user)
         return Response(serializer.data, status=201)
