@@ -25,7 +25,7 @@ SECRET_KEY = '=k3+@_5z^cb-#*dm2_1wp-b=7hudv12(a%zdh3+o(__jlx%evh'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '192.168.0.21', 'localhost:3000']
 LOGIN_URL = "/login"
 MAX_NOTION_LENGTH = 240
 NOTION_ACTION_OPTION = ["like", "unlike", "share"]
@@ -40,7 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # third-party
+    'corsheaders',
     'rest_framework',
+    'rest_framework.authtoken',
     # internal
     'myapp',
 ]
@@ -48,6 +50,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -125,6 +128,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+CORS_ORIGIN_ALLOW_ALL = True  # any website has access to my api
+CORS_URLS_REGEX = r'^/api/.*$'
+
 DEFAULT_RENDERER_CLASSES = [
     'rest_framework.renderers.JSONRenderer',
 ]
@@ -134,8 +140,12 @@ if DEBUG:
     ]
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
+    'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',
-    ],
-    'DEFAULT_RENDERER_CLASSES': DEFAULT_RENDERER_CLASSES
+        'rest_framework.authentication.TokenAuthentication',
+    ),
+    'DEFAULT_RENDERER_CLASSES': DEFAULT_RENDERER_CLASSES,
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
 }
