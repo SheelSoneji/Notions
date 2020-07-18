@@ -1,9 +1,37 @@
 import React, { useEffect, useState } from "react";
 import { loadNotions } from "../lookup";
+//import { NotionsList } from ".";
 
+export function NotionsComponent(props) {
+  const textAreaRef = React.createRef();
+  const handleSubmit = event => {
+    event.preventDefault();
+    const newVal = textAreaRef.current.value;
+    console.log(newVal);
+    textAreaRef.current.value = "";
+  };
+  return (
+    <div className={props.className}>
+      <div className="col-12 mb-3">
+        <form onSubmit={handleSubmit}>
+          <textarea
+            ref={textAreaRef}
+            required={true}
+            className="form-control"
+            placeholder="Post a notion"
+            name="notion"
+          ></textarea>
+          <button type="submit" className="btn btn-primary my-3">
+            Notionize
+          </button>
+        </form>
+      </div>
+      <NotionsList />
+    </div>
+  );
+}
 export function NotionsList(props) {
   const [notions, setNotions] = useState([]);
-
   useEffect(() => {
     const myCallback = (response, status) => {
       if (status === 200) {
@@ -24,7 +52,6 @@ export function NotionsList(props) {
     );
   });
 }
-
 export function ActionBtn(props) {
   const { notion, action } = props;
   const [likes, setLikes] = useState(notion.likes ? notion.likes : 0);
@@ -55,7 +82,6 @@ export function ActionBtn(props) {
     </button>
   );
 }
-
 export function Notion(props) {
   const { notion } = props;
   const className = props.className
@@ -64,7 +90,7 @@ export function Notion(props) {
   return (
     <div className={className}>
       <p>
-        {notion.id}-{notion.content}
+        {notion.id} - {notion.content}
       </p>
       <div className="btn btn-group">
         <ActionBtn
@@ -73,7 +99,7 @@ export function Notion(props) {
         />
         <ActionBtn
           notion={notion}
-          action={{ type: "unlike", display: "Unlikes" }}
+          action={{ type: "unlike", display: "Unlike" }}
         />
         <ActionBtn
           notion={notion}
