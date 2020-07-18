@@ -1,72 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import logo from "./logo.svg";
 import "./App.css";
+import { NotionsList } from "./notions";
 
-const loadNotions = function(callback) {
-  // GetCookie
-  var cookieValue = null;
-  var name = "csrftoken";
-  if (document.cookie && document.cookie !== "") {
-    var cookies = document.cookie.split(";");
-    for (var i = 0; i < cookies.length; i++) {
-      var cookie = cookies[i].trim();
-      // Does this cookie string begin with the name we want?
-      if (cookie.substring(0, name.length + 1) === name + "=") {
-        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-        break;
-      }
-    }
-  }
-  const xhr = new XMLHttpRequest();
-  const method = "GET";
-  const url = "http://localhost:8000/api/notions/";
-  const responseType = "json";
-
-  xhr.responseType = responseType;
-  xhr.open(method, url);
-  xhr.setRequestHeader("Content-Type", "application/json");
-  //xhr.setRequestHeader("HTTP_X_REQUESTED_WITH", "XMLHttpRequest");
-  xhr.setRequestHeader("X-Requested-with", "XMLHttpRequest");
-  xhr.setRequestHeader("X-CSRFToken", cookieValue);
-  xhr.onload = function() {
-    callback(xhr.response, xhr.status);
-  };
-  xhr.onerror = function(e) {
-    console.log(e);
-    callback({ message: "The request was an error" }, 400);
-  };
-  xhr.send();
-};
-
-function Notion(props) {
-  const { notion } = props;
-  const className = props.className
-    ? props.className
-    : "col-10 mx-auto col-md-6";
-  return (
-    <div className={className}>
-      <p>
-        {notion.id}-{notion.content}
-      </p>
-    </div>
-  );
-}
 
 function App() {
-  const [notions, setNotions] = useState([]);
-
-  useEffect(() => {
-    const myCallback = (response, status) => {
-      console.log(response, status);
-      if (status === 200) {
-        setNotions(response);
-      } else {
-        console.log("There was an error");
-      }
-    };
-    loadNotions(myCallback);
-  }, []);
-
   return (
     <div className="App">
       <header className="App-header">
@@ -75,15 +13,7 @@ function App() {
           Edit <code>src/App.js</code> and save to reload.
         </p>
         <div>
-          {notions.map((item, index) => {
-            return (
-              <Notion
-                notion={item}
-                className="my-5 py-5 border bg-white text-dark"
-                key={`${index}-{item.id}`}
-              />
-            );
-          })}
+          <NotionsList />
         </div>
         <a
           className="App-link"
