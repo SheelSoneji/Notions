@@ -22,7 +22,7 @@ from myapp.views import home_view, notion_detail_view, notion_list_view, notion_
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', home_view),
-    path('react/', TemplateView.as_view(template_name='react.html')),
+    path('react/', TemplateView.as_view(template_name='react_via_dj.html')),
     path('create-notion', notion_create_view),
     path('notions', notion_list_view),
     path('notions/<int:notion_id>', notion_detail_view),

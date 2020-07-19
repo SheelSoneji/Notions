@@ -1,12 +1,12 @@
 {% extends 'base.html' %} {% block headtitle %} testing {% endblock headtitle %}
 {% block content %}
-<div class="row text-center">
+<div class="row text-center d-none">
   <div class="col">
     <h1>Welcome to Notions</h1>
   </div>
 </div>
 
-<div class="row mb-3">
+<div class="row mb-3 d-none">
   <div class="col-md-4 mx-auto col-10">
     <form
       class="form"
@@ -30,8 +30,8 @@
     </form>
   </div>
 </div>
-
-<div class="row" id="notions">loading...</div>
+<div id="notions-2"></div>
+<div class="row d-none" id="notions">loading...</div>
 <script>
   function getCookie(name) {
     var cookieValue = null;
