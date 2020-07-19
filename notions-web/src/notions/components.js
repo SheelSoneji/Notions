@@ -4,10 +4,18 @@ import { loadNotions } from "../lookup";
 
 export function NotionsComponent(props) {
   const textAreaRef = React.createRef();
+  const [newNotions, setNewNotions] = useState([]);
   const handleSubmit = event => {
     event.preventDefault();
     const newVal = textAreaRef.current.value;
-    console.log(newVal);
+    let tempNewNotions = [...newNotions];
+    //change this to a server side call
+    tempNewNotions.unshift({
+      content: newVal,
+      likes: 0,
+      id: 12313
+    });
+    setNewNotions(tempNewNotions);
     textAreaRef.current.value = "";
   };
   return (
@@ -26,22 +34,31 @@ export function NotionsComponent(props) {
           </button>
         </form>
       </div>
-      <NotionsList />
+      <NotionsList newNotions={newNotions} />
     </div>
   );
 }
 export function NotionsList(props) {
+  const [notionsInit, setNotionsInit] = useState([]);
   const [notions, setNotions] = useState([]);
+  //setNotionsInit([...props.newNotions].concat(notionsInit));
+  useEffect(() => {
+    const final = [...props.newNotions].concat(notionsInit);
+    if (final.length !== notions.length) {
+      setNotions(final);
+    }
+  }, [props.newNotions, notions, notionsInit]);
+
   useEffect(() => {
     const myCallback = (response, status) => {
       if (status === 200) {
-        setNotions(response);
+        setNotionsInit(response);
       } else {
         console.log("There was an error");
       }
     };
     loadNotions(myCallback);
-  }, []);
+  }, [notionsInit]);
   return notions.map((item, index) => {
     return (
       <Notion
